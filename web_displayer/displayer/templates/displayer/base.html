@@ -39,6 +39,13 @@
                 <i class="server icon"></i>
                   Twitter Data
                 </a>
+                <a class="item">
+                <form method="POST">
+                  {% csrf_token %}
+                  <input class="ui button secondary" type="Submit" value="Update Data" name="updatebtn">
+                  <i class="download icon"></i>
+                </form>
+              </a>
               </div>
               <div class="pusher">
                 <!-- Site content !-->

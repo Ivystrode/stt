@@ -4,7 +4,7 @@ from.forms import SentimentDisplayForm, GetNewNews
 import plotly.graph_objs as go
 from plotly.offline import plot
 
-from media_effectiveness import news_scraper
+from utilities import news_scraper
 
 import sqlalchemy
 import pandas as pd

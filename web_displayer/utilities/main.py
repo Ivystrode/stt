@@ -13,7 +13,16 @@ from sklearn.feature_extraction import text
 import pickle
 from collections import Counter
 
+"""
+This is the main 'utility' file that
+Its functions can be called from the django application/other modules
+It then routes the command to other utility scripts (news scraper/tweet_getter)
+"""
+
 def clean(data):
+    """
+    Use regex (yuck) to clean up strings
+    """
     try:
         return ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)", " ", data).split())
     except:
@@ -24,6 +33,7 @@ def clean(data):
 def get_user_tweets(user, num):
     """
     Get tweets and store to tweet_data table
+    using the tweepy library to connect to twitter API
     """
     twitter_client = tweet_getter.TwitterClient()
     api = twitter_client.get_twitter_client_api()
@@ -34,6 +44,10 @@ def get_user_tweets(user, num):
     return tweet_analyzer.tweets_to_df(tweets, user)
     
 def get_keyword_tweets(keywords: list, listen_time: int):
+    """
+    Get tweets containing a particular keyword/s on command
+    using the tweepy Stream class
+    """
     listener = tweet_getter.TweetStreamer()
     listener.stream_tweets("tweetstore.json", keywords, listen_time)
     
@@ -41,6 +55,13 @@ def get_keyword_tweets(keywords: list, listen_time: int):
 def get_news(searchterm):
     news_scraper.scraper(searchterm)
     
+    
+# ==========Data Preparation==========
+"""
+These functions are to be run when the dataset is updated
+This can be done via the dashboard
+"""
+
 def get_authors():
     conn=sqlite3.connect("sent_data.db")
     cur=conn.cursor()
@@ -96,6 +117,10 @@ def remove_common_words():
 
 
 def prepare_tweet_data():
+    """
+    Goes over the database (which may have been updated since this function was last called)
+    and creates new corpuses to be used by the views for displaying the more up to date data
+    """
     authors = {clean(a) for a in get_authors()}
     print(authors)
 
@@ -123,9 +148,13 @@ def prepare_tweet_data():
     return dict_df
 
 def stop_words():
+    """
+    Simply to get the stop words from another file
+    """
     return text.ENGLISH_STOP_WORDS
 
 
 if __name__ == '__main__':
+    # if running manually
     prepare_tweet_data()
     

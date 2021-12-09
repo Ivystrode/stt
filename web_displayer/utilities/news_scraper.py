@@ -35,6 +35,12 @@ def analyze_sentiment(data):
  
 
 def scraper(subject):
+    """
+    Using the 'sites' dictionary, scrapes a selection of news websites for the desired subject and stores to the database
+    Web scraping is labour intensive and vulnerable to breaking very easily if any classes/etc change. For now only using
+    aljazeera but this can be expanded by finding 1. the search URL for the website and 2. the elements that contain the 
+    links and adding them to the dictionary (see below for example of structure)
+    """
     
     # store sites as a dictionary
     # key is site name, value is a list - element 1 is the search url, element 2 is the search result element, and 3 is the class
@@ -114,6 +120,7 @@ def scraper(subject):
 
 
 if __name__ == '__main__':
+    # testing purposes only
     df = scraper("COP26")
     engine = sqlalchemy.create_engine('sqlite:///sent_data.db')
     df.to_sql("news_data", engine, if_exists="append", index=False)

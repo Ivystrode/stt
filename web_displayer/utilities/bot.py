@@ -5,7 +5,7 @@ import os
 import threading
 try:
     import keys, main, brain
-    # when using django
+    # when using django (ie not testing)
 except:
     from . import keys, main, brain
     
@@ -22,10 +22,14 @@ updater = Updater(keys.BOT_TOKEN, use_context=True)
 dispatcher = updater.dispatcher
 
 users = []
-robot_names = ["MaxiBot", "Maxibot", "maxibot", "Maxi", "maxi", "bot", "Bot", "robot", "Robot", "Wobot", "wobot"]
+robot_names = ["bot", "Bot", "robot", "Robot", "Wobot", "wobot"]
 
 
 def start_bot():
+    """
+    Starts the telegram bot
+    He lives on this machine but polls the API for messages
+    """
     global updater
     global dispatcher
     
@@ -45,9 +49,13 @@ def start(update, context):
     update.message.reply_text(reply)
     
     chat_id = update['message']['chat']['id']
-    # bot_db.add_authorised_user(int(chat_id), users_name, "regular")
     
 def talk(update, context):
+    """
+    Respond to messages that don't contain commands but do contain the bot's name 
+    (don't want it reacting to every message if its in a group chat)
+    """
+    
     users_name = update['message']['chat']['first_name']
     user_id = update['message']['chat']['id']    
     if any(word in update.message.text for word in robot_names):
@@ -65,15 +73,18 @@ def talk(update, context):
 
 
 
-def message_handler(update, context):    
-    if any(word in update.message.text for word in robot_names) and ("what" in update.message.text or "tell" in update.message.text or "show" in update.message.text or "What" in update.message.text or "Tell" in update.message.text or "Show" in update.message.text) and ("news" in update.message.text or "headlines" in update.message.text or "going on in the world" in update.message.text): 
-        get_headlines(update, context)
-    elif ("what" in update.message.text or "which" in update.message.text or "What" in update.message.text or "Which" in update.message.text) and ("server" in update.message.text):
-        server(update, context)
-    else:
-        talk(update, context)
+def message_handler(update, context):   
+    """
+    Telegram message handler - send to talk function
+    If other key phrases are detected it can send with additional arguments or
+    to other functions. This will be a future capability.
+    """ 
+    talk(update, context)
     
 def search_user(update, context):
+    """
+    Use the twitter API to pull a specified number of tweets from a specified user to the DB
+    """
     user = context.args[0]
     num = context.args[1]
     update.message.reply_text(f"Searching twitter for tweets by {user} ({num})")
@@ -81,6 +92,9 @@ def search_user(update, context):
     update.message.reply_text(f"Got {len(tweets)} from {user}")
     
 def search_keywords(update, context):
+    """
+    Perform a keyword search on tweets for a desired duration
+    """
     duration = context.args[0]
     words = context.args[1:]
     update.message.reply_text(f"Streaming tweets and filtering for:{context.args[1:]} for {context.args[0]} seconds")
@@ -89,6 +103,10 @@ def search_keywords(update, context):
 
     
 def get_sentiment(update, context):
+    """
+    Get a summary of the media sentiment of a particular topic
+    This must be a topic we have stored in the DB
+    """
     subject = context.args[0]
     engine = sqlalchemy.create_engine("sqlite:////home/main/Documents/Main/Code/Python/Data/web_displayer/sent_data.db") 
     news_df = pd.read_sql("news_data", engine)
@@ -103,7 +121,7 @@ def get_sentiment(update, context):
     update.message.reply_text(f"The attitude in the media {overall}, with a sentiment score of {av_sent}")
         
     
-    
+    # debugging
     for item in news_df:
         print(item.subject)
     
@@ -111,4 +129,4 @@ def get_sentiment(update, context):
     
     
 bot_thread = threading.Thread(name='bot', target=start_bot)
-# bot_thread.start()
+# bot_thread.start() # handled by project root

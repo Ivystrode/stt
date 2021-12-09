@@ -10,16 +10,17 @@ import pickle
 import time
 
 
+
+# ==========TRAINING THE MODEL==========
+"""
+To be run manually. Only necessary when the intents are updated.
+"""
+
+
 stemmer = LancasterStemmer()
-
-print("CHAT MODULE ACTIVE")
-
-print("loading data file")
 with open("intents.json") as file:
     data = json.load(file)
 print("data file loaded")
-
-print("...")
 try:
     with open("data.pickle", "rb") as f:
         words, labels, training, output = pickle.load(f) 

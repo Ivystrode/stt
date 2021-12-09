@@ -7,6 +7,7 @@ from textblob import TextBlob
 
 from dateutil.parser import parse, parserinfo
 try:
+    # only when running manually/testing
     import keys 
 except:
     # when using django
@@ -22,7 +23,7 @@ class CustomParserInfo(parserinfo):
 
 class TwitterClient():
     """
-    A client to browse twitter programmatically with
+    A client to browse twitter programmatically with tweepy
     """
     
     def __init__(self, twitter_user=None):
@@ -32,15 +33,17 @@ class TwitterClient():
         
     def get_twitter_client_api(self):
         """
-        Gets the twitter client to be used elsewhere
+        Gets the twitter client to be used elsewhere (helps with auth)
         """
         return self.twitter_client
         
     def get_user_timeline_tweets(self, num_tweets):
+        """
+        The "cursor" goes over the user's timeline and gets up to num_tweets specified
+        If you don't specify a user it defaults to you (user logged in on the API)
+        """
         tweets = []
         
-        # cursor goes over the user's timelines and gets up to num_tweets
-        # if you dont specify a user it defaults to YOU
         for tweet in tweepy.Cursor(self.twitter_client.user_timeline, id=self.twitter_user).items(num_tweets):
             tweets.append(tweet)
         return tweets
@@ -62,7 +65,7 @@ class TwitterClient():
 
 class Authenticator():
     """
-    Use to log in to twitter
+    Use to log in to twitter. Returns the auth object that other classes/etc can use to auth.
     """
     
     def authenticate(self):
@@ -72,7 +75,7 @@ class Authenticator():
    
 class TweetStreamer():
     """
-    Configures the tweetlistener class to stream tweets with the desired hashtag filters
+    Configures the tweetlistener class to stream tweets with the desired keyword filters
     """
     
     def __init__(self):
@@ -90,10 +93,10 @@ class TweetStreamer():
 
 class TweetListener(tweepy.Stream):
     """
-    Takes the streamed tweets and stores them to the database.
+    Streams the tweets for the specified duration and stores them to the database.
     Inherits from the Stream class, with the added param of the file to store the tweets to
     (that's what super is doing)
-    Except store_file is now deprecated and I'm saving to the database...
+    Except store_file is now 'deprecated' and I'm saving to the database...
     """
     
     def __init__(self, store_file, consumer_key, consumer_secret, access_token, access_token_secret, subject):
@@ -103,6 +106,9 @@ class TweetListener(tweepy.Stream):
         print(f"tweet listener is ready to store files to {store_file}")
     
     def on_data(self, data):
+        """
+        Upon receipt of a tweet do this
+        """
         tweets = []
         try:
             data = data.decode()
@@ -128,6 +134,10 @@ class TweetListener(tweepy.Stream):
             return ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)", " ", tweet).split())
 
     def analyze_sentiment(self, tweet):
+        """
+        Uses textblob to get a polarity score
+        Subjectivity scores were not working well with tweets so excluded
+        """
         analysis = TextBlob(self.clean_tweet(tweet))
         if analysis.sentiment.polarity > 0:
             return 1 # positive tweet, happy days
@@ -137,6 +147,9 @@ class TweetListener(tweepy.Stream):
             return -1 # must be a bit of a dick
         
     def save_to_df(self, t):
+        """
+        Saves collected tweets as a df that is then passed to the DB
+        """
         tweettime = parse(t['created_at'])
         tweet = {}
         print("saving")
@@ -201,6 +214,7 @@ class TweetAnalyzer():
     
 
 if __name__ == '__main__':
+    # manual testing only
     twitter_client = TwitterClient()
     api = twitter_client.get_twitter_client_api()
     

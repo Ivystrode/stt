@@ -14,22 +14,37 @@ import sqlite3, sqlalchemy
 import pandas as pd
 import numpy as np
 
-from media_effectiveness import main, news_scraper, bot
-
+from utilities import main, news_scraper, bot
+bot_active = False
 # Create your views here.
 def home(request):
     """
     Not really much going on here except the base template
-    and we activate the bot
+    Upon first load it activates the bot and on following loads
+    it updates the database
+    
+    Future functionality will update the text data files on a button press but this was getting messy and taking time
     """
-    bot.bot_thread.start()
+    
+    # Global variables are bad practice but this is a quick fix that is working persistently (for now)
+    global bot_active
+    
+    if not bot_active:
+        bot.bot_thread.start()
+        bot_active = True
+        
+    # update the corpuses with the latest data acquired
+    if request.method == "POST":
+        print("updating data")
+        main.prepare_tweet_data()
+        print("data updated")
         
             
     return render(request, "displayer/display.html")
 
 def twitter(request):
     """
-    Where we mess with twitter data. Ask for whatever you want.
+    Where we mess with twitter data. Use the on-screen forms to get new data or display existing.
     """
     
     user_form = UserSearchForm()
@@ -48,7 +63,7 @@ def twitter(request):
         if author not in user_list:
             user_list.append(author)
             
-            
+    # search for tweets by user
     if request.method == "POST" and "userformbtn" in request.POST:
         form = UserSearchForm(request.POST)
         if form.is_valid():
@@ -154,6 +169,7 @@ def twitter(request):
             
             return render(request, "displayer/twitter.html", context)
         
+    # create a wordcloud from the tweets about a subject
     elif request.method == "POST" and "subjectbtn" in request.POST:
         form = TweetSubjectSentimentForm(request.POST)
         if form.is_valid():
@@ -185,10 +201,14 @@ def twitter(request):
                 plt.imshow(wc, interpolation="bilinear")
                 plt.axis("off")
                 plt.title(user)
+                # add index+1 to subplot to show all wordclouds (though there may be too many)
+                # in future combine all users to make one big word cloud
                 plt.savefig(f"wordcloud.png")
                 i += 1
             
             
             return render(request, "displayer/twitter.html", context)
+        
+
         
     return render(request, "displayer/twitter.html", context)
