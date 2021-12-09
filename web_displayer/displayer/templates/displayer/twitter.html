@@ -1,0 +1,77 @@
+{% extends 'displayer/base.html' %}
+<!DOCTYPE html>
+
+<html>
+    <head>
+        {% block title %}
+           Sentimenter - Twitter
+        {% endblock %}
+    </head>
+    <body>
+        {% block page_title %}
+        Twitter data collector
+        {% endblock %}
+
+        {% block subtitle %}
+        Search for terms or get data from users
+        {% endblock %}
+
+        {% block content %}
+
+        <div class="ui stackable two column grid">
+            <div class="column">
+                <div class="form-div">
+                    <form method="POST">
+                        {% csrf_token %}
+                        {{user_form.as_p}}
+                        <input type="Submit" value="Submit" name="userformbtn">
+                    </form>
+                </div>
+                <div class="userchart">
+                    {{userchart|safe}}
+                </div>
+                <div class="form-div">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <p>Enter the keywords to search for and a time in minutes to watch for them</p>
+                        {{tweet_keyword_form.as_p}}
+                        <input type="Submit" value="Submit" name="tweetkeywordbtn">
+                    </form>
+                </div>
+                <table class="ui celled inverted table">
+                    <thead>
+                      <tr>
+                        <th>Polarity</th>
+                        <th>Subjectivity</th>
+                      </tr>
+                    </thead>
+        
+                    <tbody>
+                      <tr>
+                        <td>{{pol}}</td>
+                        <td>{{sub}}</td>
+                      </tr>
+        
+                    </tbody>
+        
+                  </table>
+                <div class="form-div">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <p>Enter a subject to visualise</p>
+                        {{subject_form.as_p}}
+                        <input type="Submit" value="Submit" name="subjectbtn">
+                    </form>
+                </div>
+                <img src="/media/wordcloud1.png">
+            </div>
+
+
+
+        </div>
+
+
+        {% endblock %}
+        <script src="" async defer></script>
+    </body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+    <head>
+        <title>{% block title %}{% endblock %}</title>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>The Sentimenter</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+        <script src='https://api.mapbox.com/mapbox-gl-js/v2.5.1/mapbox-gl.js'></script>
+        <link href='https://api.mapbox.com/mapbox-gl-js/v2.5.1/mapbox-gl.css' rel='stylesheet' />
+        <link rel="stylesheet" href="{% static 'css/base.css' %}">
+        
+        {% block css %}
+        {% endblock %}
+
+        {% block headscript %}{% endblock %}
+
+    </head>
+    <body>
+
+    <h1>{% block page_title %}{% endblock %}</h1>
+    <h3>{% block subtitle %}{% endblock %}</h3>
+        <div id="content">
+            <div class="ui sidebar visible inverted vertical menu">
+                <a class="item" href="/">
+                <i class="home icon"></i>
+                  SENTIMENTER
+                </a>
+                <a class="item" href="/sentiment">
+                <i class="archive icon"></i>
+                  Topic Sentiment
+                </a>
+                <a class="item" href="/twitter">
+                <i class="server icon"></i>
+                  Twitter Data
+                </a>
+              </div>
+              <div class="pusher">
+                <!-- Site content !-->
+              </div>
+            {% block content %}
+            {% endblock %}             
+        </div>
+
+
+    </body>
+    {% block script %}{% endblock %}
+    <script src="{% static 'scripts/js/base.js' %}"></script>
+
+</html>

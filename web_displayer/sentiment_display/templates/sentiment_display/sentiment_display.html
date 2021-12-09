@@ -1,0 +1,36 @@
+{% extends 'displayer/base.html' %}
+<head>
+    {% block css %}
+    {% endblock %}
+    
+    {% block title %}Sentimenter - Sentiment{% endblock %}
+</head>
+<body>
+    {% block page_title %}Sentiment Display{% endblock %}
+    {% block subtitle %}Choose a topic to see users polarity visualised{% endblock %}
+    
+    {% block content %}
+    
+    <div class="form-div">
+        <form method="POST">
+            {% csrf_token %}
+            <p>Enter a subject to search news sites for</p>
+            {{get_new_news_form.as_p}}
+            <input type="Submit" value="Submit" name="getnewnews">
+        </form>
+    </div>
+
+    <div class="form-div">
+        <form method="POST">
+            {% csrf_token %}
+            <p>Enter a subject to plot sentiment values over time</p>
+            {{sentiment_display_form.as_p}}
+            <input type="Submit" value="Submit" name="getsentiment">
+        </form>
+    </div>
+    <p></p>
+    <div class="sentchart">
+        {{sentchart|safe}}
+    </div>
+    {% endblock %}
+</body>
