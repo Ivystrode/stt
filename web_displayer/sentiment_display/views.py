@@ -23,10 +23,8 @@ def sentiment_displayer(request):
     context = {"sentiment_display_form": sentiment_display_form,
                "get_new_news_form": get_new_news_form}
     
-    # engine = sqlalchemy.create_engine("sqlite:////home/main/Documents/Main/Code/Python/Data/web_displayer/sent_data.db") 
-    # df = pd.read_sql("news_data", engine)
 
-    
+    # scrape for articles on subject given
     if request.method == "POST" and "getnewnews" in request.POST:
         form = GetNewNews(request.POST)
         print("GETTING NEW NEWS")
@@ -34,10 +32,9 @@ def sentiment_displayer(request):
             subject = form.cleaned_data['subject']
             print(subject)
             news_scraper.scraper(subject)
-            # engine = sqlalchemy.create_engine("sqlite:////home/main/Documents/Main/Code/Python/Data/web_displayer/sent_data.db") 
-            # df = pd.read_sql("news_data", engine)
             return render(request, "sentiment_display/sentiment_display.html", context)
         
+    # get the overall sentiment on the given subject (if stored to DB - if not run the scraper above)
     elif request.method == "POST" and "getsentiment" in request.POST:
         form = SentimentDisplayForm(request.POST)
         print("GETTING SENTIMENT")
