@@ -2,7 +2,7 @@ try:
     import tweet_getter, news_scraper
 except:
     # when using django
-    from . import tweet_getter
+    from . import tweet_getter, news_scraper
 import numpy as np
 import pandas as pd
 import sqlite3, sqlalchemy
